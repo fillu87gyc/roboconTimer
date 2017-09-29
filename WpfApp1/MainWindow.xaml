@@ -39,17 +39,28 @@
                 Grid.ColumnSpan="2"
                 FontSize="50"
                 Foreground="White"
-                Text="{Binding Path=Timer}"
+                Text="{Binding Path=Timer, UpdateSourceTrigger=PropertyChanged}"
                 TextAlignment="Center"
                 TextWrapping="Wrap" />
         </Viewbox>
         <Button
+            Name="Limited"
             Width="75"
             Height="20"
             Margin="90,7,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
+            Click="Limited_Click"
             Content="3分" />
+        <Button
+            Name="OneLimited"
+            Width="75"
+            Height="20"
+            Margin="170,7,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Click="OneLimited_Click"
+            Content="1分" />
         <Viewbox
             Grid.Row="2"
             Width="0"

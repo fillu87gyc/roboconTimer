@@ -26,19 +26,23 @@ namespace WpfApp1
 		public MainWindow()
 		{
 			InitializeComponent();
-			TimerMg = new TimerMg();
-			Timer.DataContext = TimerMg;
+			NoLimitedTimerMg = new NoLimitedTimerMg();
+			LimitedTimerMg = new LimitedTimerMg();
+
 			dispatcherTimer = new DispatcherTimer(DispatcherPriority.Normal);
 			dispatcherTimer.Interval = new TimeSpan(100000);
 			dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
 			dispatcherTimer.Start();
+			this.DataContext = new { Timer = "00:00" };
 		}
 
 		void dispatcherTimer_Tick(object sender, EventArgs e)
 		{
-			TimerMg.Timer = TimerMg.Timer;
+			LimitedTimerMg.Timer = LimitedTimerMg.Timer;
+			NoLimitedTimerMg.Timer = NoLimitedTimerMg.Timer;
 		}
-		TimerMg TimerMg;
+		NoLimitedTimerMg NoLimitedTimerMg;
+		LimitedTimerMg LimitedTimerMg;
 		public int Red { get; set; }
 		public int Blue { get; set; }
 
@@ -67,16 +71,31 @@ namespace WpfApp1
 		}
 
 
-		void NoLimit_Click(object sender, RoutedEventArgs e) { }
+		void NoLimit_Click(object sender, RoutedEventArgs e)
+		{
+			NoLimitedTimerMg.Init();
+			Timer.DataContext = NoLimitedTimerMg;
+		}
+		private void Limited_Click(object sender, RoutedEventArgs e)
+		{
+			LimitedTimerMg.Init(new TimeSpan(0, 3, 0));
+			Timer.DataContext = LimitedTimerMg;
+		}
+
+		private void OneLimited_Click(object sender, RoutedEventArgs e)
+		{
+			LimitedTimerMg.Init(new TimeSpan(0, 1, 0));
+			Timer.DataContext = LimitedTimerMg;
+		}
 	}
-	public class TimerMg: INotifyPropertyChanged
+	public class NoLimitedTimerMg : INotifyPropertyChanged
 	{
 		private DateTime startDate;
-		public TimerMg()
+		public NoLimitedTimerMg()
 		{
 			startDate = DateTime.Now;
 		}
-		
+
 		public int ElapsedMilliSec()
 		{
 			DateTime endDate = DateTime.Now;
@@ -89,24 +108,89 @@ namespace WpfApp1
 		{
 			get
 			{
-
 				int time = ElapsedMilliSec();
 				int min = time / 60;
 				int sec = time % 60;
-
-				timer = ("0" + min + " : " + sec).ToString();
+				if (sec >= 10)
+					timer = ("0" + min + " : " + sec).ToString();
+				else
+					timer = ("0" + min + " : 0" + sec).ToString();
 				return timer;
 			}
 			set
 			{
-				if (this.timer == value) { return; }
-				this.timer = value;
+				//if (this.timer == value) { return; }
+				//this.timer = value;
 				var h = this.PropertyChanged;
 				if (h != null)
 				{
 					h(this, new PropertyChangedEventArgs("Timer"));
 				}
 			}
+		}
+		public void Init()
+		{
+			startDate = DateTime.Now;
+		}
+	}
+	public class LimitedTimerMg : INotifyPropertyChanged
+	{
+		TimeSpan basetime;
+		private DateTime startDate;
+		public LimitedTimerMg()
+		{
+			startDate = DateTime.Now;
+			basetime = new TimeSpan(0, 3, 0);
+		}
+
+		public int ElapsedMilliSec()
+		{
+			DateTime endDate = DateTime.Now;
+			TimeSpan diff = basetime - (endDate - startDate);
+
+			int min = diff.Minutes;
+			int sec = diff.Seconds;
+			int res = min * 60 + sec;
+			return res;
+		}
+		public event PropertyChangedEventHandler PropertyChanged;
+		string timer;
+		public string Timer
+		{
+			get
+			{
+				if (ElapsedMilliSec() > 0)
+				{
+					int time = ElapsedMilliSec();
+					int min = time / 60;
+					int sec = time % 60;
+					if (sec >= 10)
+						timer = ("0" + min + " : " + sec).ToString();
+					else
+						timer = ("0" + min + " : 0" + sec).ToString();
+					return timer;
+				}
+				else
+				{
+					timer = "Time Up!!";
+					return timer;
+				}
+			}
+			set
+			{
+				//if (this.timer == value) { return; }
+				//this.timer = value;
+				var h = this.PropertyChanged;
+				if (h != null)
+				{
+					h(this, new PropertyChangedEventArgs("Timer"));
+				}
+			}
+		}
+		public void Init(TimeSpan basetimer)
+		{
+			startDate = DateTime.Now;
+			basetime = basetimer;
 		}
 	}
 }
