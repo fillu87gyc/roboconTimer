@@ -33,7 +33,7 @@ namespace WpfApp1
 			dispatcherTimer.Interval = new TimeSpan(100000);
 			dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
 			dispatcherTimer.Start();
-			this.DataContext = new { Timer = "00:00" };
+			this.DataContext = new { Timer = "Ready?" };
 		}
 
 		void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -70,7 +70,6 @@ namespace WpfApp1
 			BluePanel.Text = "            " + Blue.ToString();
 		}
 
-
 		void NoLimit_Click(object sender, RoutedEventArgs e)
 		{
 			NoLimitedTimerMg.Init();
@@ -86,6 +85,20 @@ namespace WpfApp1
 		{
 			LimitedTimerMg.Init(new TimeSpan(0, 1, 0));
 			Timer.DataContext = LimitedTimerMg;
+		}
+		DateTime stoptime;
+		private void StopButton_Click(object sender, RoutedEventArgs e)
+		{
+			//タイマー停止
+			Timer.DataContext = new { Timer = Timer.Text };
+			stoptime = DateTime.Now;
+		}
+
+		private void ReopenButton_Click(object sender, RoutedEventArgs e)
+		{
+			Timer.DataContext = LimitedTimerMg;
+			LimitedTimerMg.SetAddTime(DateTime.Now - stoptime);
+			stoptime = DateTime.Now;
 		}
 	}
 	public class NoLimitedTimerMg : INotifyPropertyChanged
@@ -136,17 +149,18 @@ namespace WpfApp1
 	public class LimitedTimerMg : INotifyPropertyChanged
 	{
 		TimeSpan basetime;
+		TimeSpan addTime;
 		private DateTime startDate;
 		public LimitedTimerMg()
 		{
 			startDate = DateTime.Now;
-			basetime = new TimeSpan(0, 3, 0);
+			addTime = new TimeSpan(0, 0, 0);
 		}
 
 		public int ElapsedMilliSec()
 		{
 			DateTime endDate = DateTime.Now;
-			TimeSpan diff = basetime - (endDate - startDate);
+			TimeSpan diff = basetime - (endDate - startDate)+addTime;
 
 			int min = diff.Minutes;
 			int sec = diff.Seconds;
@@ -191,6 +205,11 @@ namespace WpfApp1
 		{
 			startDate = DateTime.Now;
 			basetime = basetimer;
+			addTime = new TimeSpan(0, 0, 0);
+		}
+		public void SetAddTime(TimeSpan val)
+		{
+			addTime = val;
 		}
 	}
 }

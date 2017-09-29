@@ -105,7 +105,8 @@
             VerticalAlignment="Top"
             Click="BlueDown_Click"
             Content="青-" />
-        <StackPanel Grid.Column="1" />
+
+
         <Button
             x:Name="RedUp"
             Grid.Column="1"
@@ -137,5 +138,25 @@
             VerticalAlignment="Top"
             Click="BlueUp_Click"
             Content="青+" />
+        <Button
+            Name="StopButton"
+            Grid.ColumnSpan="2"
+            Width="40"
+            Height="20"
+            Margin="250,7,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Click="StopButton_Click"
+            Content="停止" />
+        <Button
+            Name="ReopenButton_Copy"
+            Grid.Column="1"
+            Width="46"
+            Height="20"
+            Margin="37,7,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Click="ReopenButton_Click"
+            Content="再開" />
     </Grid>
 </Window>
